@@ -14,6 +14,7 @@ ___
 ## Table of contents
 
 * [Overview](#overview)
+* [Current Work](#current-work)
 * [Getting Started](#getting-started)
 * [Change Log](#change-log)
 
@@ -26,6 +27,10 @@ ___
 Truth Tree is an interactive, GIS-based data visualization tool presenting the breakdown of government spending and related metrics in an effort to provide a unified resource to gauge public investment effectiveness.
 
 Our long-term goal is a community-driven platform where registered users can create their own data visualizations, publish stories, compare trends, and engage with the public and policymakers on the issues that matter most.
+
+<a id="current-work"></a>
+
+## Current Work
 
 Phase One efforts consist of converting the Government Finance Database into a highly accessible and interactive website.
 
