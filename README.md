@@ -63,7 +63,7 @@ In a terminal instance:
 9. Download 20m State & County geojson files from http://eric.clst.org/tech/usgeojson/ and place in assets/ directory (rename ```states_2010.json``` & ```counties_2010.json```)
 10. ```python3 modify_geojson.py```
 11. ```exit```
-12 cd ../../
+12. ```cd ../../```
 13. ```yarn start```
 
 <a id="change-log"></a> 
