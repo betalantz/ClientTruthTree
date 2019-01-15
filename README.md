@@ -48,7 +48,7 @@ ___
 
 <a id="getting-started"></a>
 
-## Getting Started in Development (using yarn)
+## Getting Started in Development (using yarn and pipenv)
 
 In a terminal instance:
 
@@ -56,7 +56,15 @@ In a terminal instance:
 2. ```cd ClientTruthTree/```
 3. ```yarn install``` to install required dependencies.
 4. ```touch env``` and add your Mapbox access key as REACT_APP_MAPBOX_ACCESS_TOKEN.
-5. ```yarn start```
+5. ```cd src/assets/```
+6. ```pipenv shell```
+7. ```pipenv install```
+8. Download State and County datasets from [The Government Finance Database](http://willamette.edu/mba/research-impact/public-datasets/index.html) and place in assets/ directory.
+9. Download 20m State & County geojson files from http://eric.clst.org/tech/usgeojson/ and place in assets/ directory (rename ```states_2010.json``` & ```counties_2010.json```)
+10. ```python3 modify_geojson.py```
+11. ```exit```
+12 cd ../../
+13. ```yarn start```
 
 <a id="change-log"></a> 
 
