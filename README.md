@@ -30,9 +30,9 @@ Our long-term goal is a community-driven platform where registered users can cre
 Phase One efforts consist of converting the Government Finance Database into a highly accessible and interactive website.
 
 If you're interested in contributing, we reccomend checking out the following resources:
-- [Democracy Lab Profile] (https://www.democracylab.org/index/?section=AboutProject&id=69)
-- [Government Finance Database] (http://willamette.edu/mba/research-impact/public-datasets/index.html)
-- [IHME Opioid Study] (https://github.com/benbenbuhben/client_opioid_study) (Our Phase One efforts will be based heavily on presenting a similar tool with the GFD dataset)
+- [Democracy Lab Profile](https://www.democracylab.org/index/?section=AboutProject&id=69)
+- [Government Finance Database](http://willamette.edu/mba/research-impact/public-datasets/index.html)
+- [IHME Opioid Study](https://github.com/benbenbuhben/client_opioid_study) (Our Phase One efforts will be based heavily on presenting a similar tool with the GFD dataset)
 
 Front-end Tools: React, Mapbox GL JS, and D3 (VictoryJS)
 
