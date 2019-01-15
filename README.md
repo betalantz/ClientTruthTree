@@ -59,7 +59,7 @@ Other useful references:
 
 ## Next Steps
 
-As a proof of life, we have a chloropleth map presenting state correctional spending (total, per capita, and as a percent of total expenditures). Aside from general cleanup, we could use much help in: 
+As a preliminary proof of concept, this repo generates a chloropleth map presenting state correctional spending (total, per capita, and as a percent of total expenditures). Aside from general cleanup, we could use much help in: 
 
 1. Integrating the front-end to dynamically call (perhaps through a typeahead-driven form) a specified column in the dataset (not just correctional spending) from the backend and render out the associated chloropleth on the frontend. 
 2. Update the chloropeth layer to show county-level data on zoom (https://www.mapbox.com/mapbox-gl-js/example/updating-choropleth/). This will require making appends to the county geojson file.
