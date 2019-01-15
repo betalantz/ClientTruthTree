@@ -6,9 +6,10 @@
 
 **Version**: 0.1.0
 
-
 **Back-end GitHub Repo:** 
 https://github.com/TruthTree/TruthTreeAPI
+
+Front-end Tools: React, Mapbox GL JS, and D3 (VictoryJS)
 ___
 
 ## Table of contents
@@ -53,8 +54,6 @@ Other useful references:
 - [ClearGov](https://www.cleargov.com/)
 - [Gapminder](https://www.gapminder.org/tools/#$state$time$value=2018;;&chart-type=bubbles)
 - [IHME Viz Hub](https://vizhub.healthdata.org/gbd-compare/)
-
-Front-end Tools: React, Mapbox GL JS, and D3 (VictoryJS)
 
 <a id="next-steps"></a>
 
