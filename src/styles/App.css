@@ -1,0 +1,155 @@
+.App {
+  text-align: center;
+}
+
+.spinner{
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  margin-top: 37vh;
+}
+
+.map {
+  width: 100vw;
+  height: 100vh;
+}
+
+.header{
+  position: fixed;
+  top:0;
+  height: 130px;
+  width: 100%;
+  background-color: white;
+  z-index: 100000;
+  -webkit-box-shadow: 0 4px 3px -3px gray;
+  -moz-box-shadow: 0 4px 3px -3px gray;
+  box-shadow: 0 4px 3px -3px gray;
+}
+
+.header-tab{
+  font-family: 'Playfair Display', serif;
+  background-color: #08306b;
+  color:white;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1;
+  position:fixed;
+  top:0;
+  z-index: 1000;
+  margin-left: 6vw;
+  height:100px;
+  padding: 10px;
+  padding-top:48px;
+  /* text-align: center; */
+  margin-top:0px;
+}
+
+.hamburger-menu{
+  position: fixed;
+  top: 53px;
+  right: 95px;
+  z-index: 1000;
+}
+
+.page-title{
+  font-family: 'Adamina', serif;
+  width:100%;
+  margin: 0 auto;
+  margin-top: 45px;
+  text-align: center;
+  font-size: 3.6vw;
+  color: #08306b;
+}
+
+.subtitle{
+  font-family: 'Mukta', sans-serif;
+  letter-spacing: 2px;
+  color: gray;
+  /* width:100%; */
+  margin: 0 calc(2*(100px+7vw));
+  margin-top: 15px;
+  text-align: center;
+  font-size: 1.2vw;
+  line-height: 1;
+}
+
+#page1 {
+  width: 100%;
+  height: calc(100vh - 150px);
+  margin-top: 150px;
+  animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+  animation-duration: 1s;
+  overflow: hidden;
+}
+
+#page2 {
+  /* height: calc(100vh - 150px); */
+  /* overflow:scroll; */
+  margin-top: 10px;
+  /* margin-bottom:40px; */
+  /* background-color: rgba(66,146,198, 0.1); */
+  /* background-color: rgba(66,146,198, 0.1); */
+  padding: 10px 0px;
+}
+
+.fade-in {
+	opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 2s;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.results-appear {
+  opacity: 0.01;
+}
+
+.results-appear.results-appear-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.results-enter {
+  opacity: 0.01;
+}
+
+.results-enter.results-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.results-exit {
+  opacity: 1;
+}
+
+.results-exit.results-exit-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.relative{
+  opacity: 1;
+  transition: opacity 3s ease-in;
+}
+
+

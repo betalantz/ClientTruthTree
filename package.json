@@ -1,0 +1,35 @@
+{
+  "name": "client_opioid_study",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "mapbox-gl": "^0.52.0-beta.2",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-hamburger-menu": "^1.1.1",
+    "react-player-controls": "^1.0.0-beta.0",
+    "react-rangeslider": "^2.2.0",
+    "react-scripts": "2.1.1",
+    "react-scroll-to-component": "^1.0.2",
+    "react-scroll-up-button": "^1.6.4",
+    "react-spinners": "^0.4.7",
+    "react-transition-group": "^2.5.1",
+    "superagent": "^4.0.0",
+    "victory": "^31.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

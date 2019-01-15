@@ -1,0 +1,152 @@
+.map-header{
+  height:70px;
+  width: 70%;
+  margin: 0px auto;
+  margin-bottom:0px;
+  padding-bottom:0px;
+  background-color: #08306b;
+  border: 1px solid black;
+  border-bottom: none;
+  text-align: center;
+  padding-top:23px;
+}
+
+.map-header-text{
+  font-family: 'Adamina', serif;
+  color:white;
+  font-size:20px;
+  margin-left:25px;
+}
+
+input:checked+.toggle{
+  background: #3690c0 !important;
+}
+
+.toggle:hover {
+  color: #3690c0 !important;
+  border-color: #3690c0 !important;
+}
+
+input:checked+.toggle:hover{
+  color: white !important;
+}
+
+.mapboxgl-map {
+  width: 70%;
+  height: 60vh;
+  margin: 0 auto;
+  /* margin-top:0px; */
+  border: 1px solid black;
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.mapboxgl-map{
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.yearOverlay-visible {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-size: 200px;
+  opacity: 0.65;
+  color: gray;
+}
+
+.yearOverlay-hidden {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-size: 200px;
+  opacity: 0.65;
+  color: gray;
+}
+
+.map-footer {
+  display: flex;
+  height:50px;
+  width: 70%;
+  margin: 0px auto;
+  margin-bottom:0px;
+  padding-bottom:0px;
+  background-color: white;
+  border: 1px solid black;
+  border-top: none;
+  text-align: center;
+}
+
+.legend-title{
+  line-height: 0.6 !important;
+}
+
+
+.play-pause {
+  width: 7%;
+  height: 100%;
+  display: inline-block;
+  float: left;
+  padding: 6px 3px 6px 0px;
+  cursor: pointer;
+  color: #045a8d;
+  border-right: 1px solid gray;
+}
+
+.current-year{
+  margin: 5px;
+  width: 13%;
+  height: auto;
+  display: inline-block;
+  float: left;
+  font-size: 1.7vw;
+  padding: 6px 0px;
+  padding-top: 7px;
+  letter-spacing: 1.5px;
+  color: #045a8d;
+  font-weight: bold;
+  /* border: 0.5px solid gray;
+  border-radius: 2px;
+  box-shadow: inset 0.1px 0.1px 0.1px 0.1px; */
+  
+}
+
+.slider-horizontal{
+  border-left: 1px solid gray;
+  width: 80%;
+  margin: 0 auto;
+  display: inline-block;
+  float: left;
+  padding: 0px 22px 0 22px;
+}
+
+.rangeslider-horizontal,
+.rangeslider__fill,
+.rangeslider__handle {
+  border-radius: 0 !important;
+}
+.rangeslider__handle:focus{
+  outline: none;
+}
+
+.rangeslider-horizontal {
+  height: 10px !important;
+}
+.rangeslider__fill {
+  background-color: #3690c0 !important;
+}
+.rangeslider__handle {
+  width: 10px !important;
+  height: 30px !important;
+
+}
+
+.rangeslider__handle:after{
+  display: none !important;
+}
+

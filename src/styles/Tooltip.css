@@ -1,0 +1,33 @@
+td {
+  width: 60px;
+  padding: 4px;
+  box-sizing: border-box;
+  border: solid 1px black;
+  text-align: center;
+  background-color: white;
+  opacity: 0.9;
+}
+
+.row-inactive {
+  color: gray;
+}
+
+.row-active {
+  font-weight: bold;
+  font-style: italic;
+  color: #08306b;
+}
+
+.tooltip-header{
+  box-sizing: border-box;
+  border: solid 1px black;
+  text-align: center;
+  width: 120px;
+  margin:0 auto;
+  padding:2px;
+  border-bottom: none;
+  background-color: #08306b;
+  color: white;
+  opacity:0.9;
+  font-weight: bold;
+}
