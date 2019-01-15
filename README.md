@@ -32,7 +32,7 @@ Our long-term goal is a community-driven platform where registered users can cre
 
 ## Current Work
 
-Phase One efforts consist of converting the Government Finance Database into a highly accessible and interactive web application to provide a baseline exploration tool.
+Phase One efforts consist of converting the Atkinson School of Management's Government Finance Database into a highly accessible and interactive web application to provide a baseline exploration tool.
 
 If you're interested in contributing, we reccomend checking out the following resources:
 - [Democracy Lab Profile](https://www.democracylab.org/index/?section=AboutProject&id=69)
