@@ -1,76 +1,106 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import mapboxgl from 'mapbox-gl';
-import data from '../assets/modified_states.json';
+import stateData from '../assets/modified_states.json';
+import countyData from '../assets/modified_counties.json';
 import Tooltip from './Tooltip';
 import '../styles/Map.css';
 import 'react-rangeslider/lib/index.css';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-const colorScaleTotal = [
-  [0, '#fff7fb'],
-  [100000, '#ece7f2'],
-  [200000, '#d0d1e6'],
-  [400000, '#a6bddb'],
-  [800000, '#74a9cf'],
-  [1600000, '#3690c0'],
-  [3200000, '#0570b0'],
-  [6400000, '#045a8d'],
-  [12800000, '#023858'],
-];
+const colorScale = {
+  state: {
+    total: [[0, '#fff7fb'],
+      [100000, '#ece7f2'],
+      [200000, '#d0d1e6'],
+      [400000, '#a6bddb'],
+      [800000, '#74a9cf'],
+      [1600000, '#3690c0'],
+      [3200000, '#0570b0'],
+      [6400000, '#045a8d'],
+      [12800000, '#023858']], 
+    fraction: [[0, '#fff7fb'],
+      [0.005, '#ece7f2'],
+      [0.01, '#d0d1e6'],
+      [0.015, '#a6bddb'],
+      [0.02, '#74a9cf'],
+      [0.025, '#3690c0'],
+      [0.03, '#0570b0'],
+      [0.035, '#045a8d'],
+      [0.04, '#023858']], 
+    perCapita: [[0, '#fff7fb'],
+      [0.05, '#ece7f2'],
+      [0.1, '#d0d1e6'],
+      [0.15, '#a6bddb'],
+      [0.2, '#74a9cf'],
+      [0.25, '#3690c0'],
+      [0.3, '#0570b0'],
+      [0.35, '#045a8d'],
+      [0.4, '#023858']],
+  },
+  county:{
+    total: [[0, '#fff7fb'],
+      [1250, '#ece7f2'],
+      [2500, '#d0d1e6'],
+      [5000, '#a6bddb'],
+      [10000, '#74a9cf'],
+      [20000, '#3690c0'],
+      [40000, '#0570b0'],
+      [80000, '#045a8d'],
+      [160000, '#023858']], 
+    fraction: [[0, '#fff7fb'],
+      [0.0125, '#ece7f2'],
+      [0.025, '#d0d1e6'],
+      [0.05, '#a6bddb'],
+      [0.1, '#74a9cf'],
+      [0.2, '#3690c0'],
+      [0.4, '#0570b0'],
+      [0.8, '#045a8d'],
+      [1.6, '#023858']], 
+    perCapita: [[0, '#fff7fb'],
+      [0.5, '#ece7f2'],
+      [1, '#d0d1e6'],
+      [1.5, '#a6bddb'],
+      [2, '#74a9cf'],
+      [2.5, '#3690c0'],
+      [3, '#0570b0'],
+      [3.5, '#045a8d'],
+      [4, '#023858']],
+  },
+};
 
-const colorScaleFraction = [
-  [0, '#fff7fb'],
-  [0.005, '#ece7f2'],
-  [0.01, '#d0d1e6'],
-  [0.015, '#a6bddb'],
-  [0.02, '#74a9cf'],
-  [0.025, '#3690c0'],
-  [0.03, '#0570b0'],
-  [0.035, '#045a8d'],
-  [0.04, '#023858'],
-];
 
-const colorScalePerCapita = [
-  [0, '#fff7fb'],
-  [0.05, '#ece7f2'],
-  [0.1, '#d0d1e6'],
-  [0.15, '#a6bddb'],
-  [0.2, '#74a9cf'],
-  [0.25, '#3690c0'],
-  [0.3, '#0570b0'],
-  [0.35, '#045a8d'],
-  [0.4, '#023858'],
-];
 
-const options = [{
-  name: 'Total',
-  description: 'Dollars',
-  property: 'correct_total_exp',
-  stops: colorScaleTotal,
-}, 
-{
-  name: 'Vs. All Expenditures',
-  description: 'Deaths per 100,000',
-  property: 'correct_as_fraction_of_total_exp',
-  stops: colorScaleFraction,
-},
-{
-  name: 'Per Capita',
-  description: 'Deaths per 100,000',
-  property: 'correct_per_capita',
-  stops: colorScalePerCapita,
-}];
 
 export default class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      active: options[0],
+      location: 'state',
+      active: this.options[0],
     };
 
   }
+
+  options = [{
+    name: 'Total',
+    description: 'Dollars',
+    property: 'correct_total_exp',
+    stops: colorScale[this.state ? this.state.location : 'state'].total,
+  }, 
+  {
+    name: 'Vs. All Expenditures',
+    description: 'Percent',
+    property: 'correct_as_fraction_of_total_exp',
+    stops: colorScale[this.state ? this.state.location : 'state'].fraction,
+  },
+  {
+    name: 'Per Capita',
+    description: 'Deaths per 100,000',
+    property: 'correct_per_capita',
+    stops: colorScale[this.state ? this.state.location : 'state'].perCapita,
+  }];
 
   setTooltip(features, active, year) {
     if (features.length && features[0].properties && features[0].properties.sovereignt) {
@@ -91,13 +121,14 @@ export default class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(this.state.active !== prevState.active){
+    if(this.state !== prevState){
       this.setFill();
     }
     
   }
 
   componentDidMount() {
+    console.log(stateData);
     this.tooltipContainer = document.createElement('div');
 
     this.map = new mapboxgl.Map({
@@ -108,22 +139,45 @@ export default class Map extends Component {
       zoom: 3,
     });
 
+    var zoomThreshold = 4;
+
     this.map.on('load', () => {
       this.map.addSource('states', {
         type: 'geojson',
-        data,
+        data: stateData,
+      });
+
+      this.map.addSource('counties', {
+        type: 'geojson',
+        data: countyData,
       });
 
       this.map.addLayer({
         id: 'states',
         type: 'fill',
         source: 'states',
+        maxzoom: zoomThreshold,
+        // filter: ['==', 'isState', true],
         paint: {
           'fill-opacity': 0,
           'fill-opacity-transition': {
             'duration': 2000,
           },
         },
+      });
+
+      this.map.addLayer({
+        id: 'counties',
+        type: 'fill',
+        source: 'counties',
+        minzoom: zoomThreshold,
+        // filter: ['==', 'isCounty', true],
+        // paint: {
+        //   'fill-opacity': 0,
+        //   'fill-opacity-transition': {
+        //     'duration': 2000,
+        //   },
+        // },
       });
 
       // Remove lables
@@ -151,6 +205,22 @@ export default class Map extends Component {
       });
 
       this.map.addLayer({
+        'id': 'county-fills',
+        'type': 'fill',
+        'source': 'counties',
+        'layout': {},
+        'minzoom': zoomThreshold,
+        'paint': {
+          'fill-color': '#08306b',
+          'fill-opacity': ['case',
+            ['boolean', ['feature-state', 'hover'], false],
+            1,
+            0,
+          ],
+        },
+      });
+
+      this.map.addLayer({
         'id': 'state-borders',
         'type': 'line',
         'source': 'states',
@@ -164,6 +234,42 @@ export default class Map extends Component {
             0.2,
           ],
         },
+      });
+
+      this.map.addLayer({
+        'id': 'county-borders',
+        'type': 'line',
+        'source': 'counties',
+        'layout': {},
+        'minzoom': zoomThreshold,
+        'paint': {
+          'line-color': 'black',
+          'line-width': 1.4,
+          'line-opacity': ['case',
+            ['boolean', ['feature-state', 'hover'], false],
+            0.9,
+            0.2,
+          ],
+        },
+      });
+
+      // Need to put ids on legend (separate for state/county)
+      // var stateLegendEl = document.getElementById('state-legend');
+      // var countyLegendEl = document.getElementById('county-legend');
+      this.map.on('zoom', () => {
+        if (this.state.location === 'state' && this.map.getZoom() > zoomThreshold) {
+          let location = 'county';
+          let options = 
+          this.setState({location});
+        } 
+        if (this.state.location === 'county' && this.map.getZoom() < zoomThreshold) {
+          let location = 'state';
+          this.setState({location});
+        } 
+        // else {
+        //     stateLegendEl.style.display = 'block';
+        //     countyLegendEl.style.display = 'none';
+        //   }
       });
 
       this.setFill();
@@ -189,20 +295,20 @@ export default class Map extends Component {
 
     // When the user moves their mouse over the state-fill layer, we'll update the
     // feature state for the feature under the mouse.
-    this.map.on('mousemove', 'state-fills', e => {
-      if(e.features.length > 0) {
-        if(this.state.hoveredStateId) {
-          this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: false});
-        }
+    // this.map.on('mousemove', 'state-fills', e => {
+    //   if(e.features.length > 0) {
+    //     if(this.state.hoveredStateId) {
+    //       this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: false});
+    //     }
 
-        let hoveredStateId = e.features[0].id;
-        this.setState({hoveredStateId});
+    //     let hoveredStateId = e.features[0].id;
+    //     this.setState({hoveredStateId});
 
-        if(this.state.hoveredStateId) {
-          this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: true});
-        }
-      }
-    });
+    //     if(this.state.hoveredStateId) {
+    //       this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: true});
+    //     }
+    //   }
+    // });
 
     // When the mouse leaves the state-fill layer, update the feature state of the
     // previously hovered feature.
@@ -222,16 +328,26 @@ export default class Map extends Component {
       this.map.setPaintProperty('states', 'fill-opacity', 1);
     }, 500);
 
-    this.map.setPaintProperty('states', 'fill-color', {
-      property,
-      stops,
-    });   
+    if(this.state.location == 'state'){
+      this.map.setPaintProperty('states', 'fill-color', {
+        property,
+        stops,
+      });   
+    }
+    else{
+      this.map.setPaintProperty('counties', 'fill-color', {
+        property,
+        stops,
+      }); 
+    }
+    
   }
 
   render() {
     const { name, description, stops, property } = this.state.active;
-    console.log(this.state.active);
-    
+    console.log(this.state);
+    console.log(this.options);
+    // console.log(countyData);
     const renderLegendKeys = (stop, i) => {
       if(stop[0] <= Math.max.apply(null, stops.map(el=>el[0]))){
         return (
@@ -248,7 +364,7 @@ export default class Map extends Component {
       return (
         <label key={i} className="toggle-container">
           <input 
-            onChange={() => this.setState({ active: options[i] })} 
+            onChange={() => this.setState({ active: this.options[i] })} 
             checked={option.property === property} 
             name="toggle" 
             type="radio" />
@@ -259,7 +375,7 @@ export default class Map extends Component {
 
     const renderedMap = <div ref={el => this.mapContainer = el} className="relative animation-fade-in fade-in">
       <div className="toggle-group absolute top left ml12 mt12 border border--2 border--white bg-white shadow-darken10 z1">
-        {options.map(renderOptions)}
+        {this.options.map(renderOptions)}
       </div>
       <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180">
         <div className='mb6'>
