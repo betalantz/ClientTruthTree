@@ -103,7 +103,7 @@ export default class Map extends Component {
   }];
 
   setTooltip(features, active, year) {
-    if (features.length && features[0].properties && features[0].properties.sovereignt) {
+    if (features.length && features[0].properties && features[0].properties.GEO_ID) {
       ReactDOM.render(
         React.createElement(
           Tooltip, {
@@ -276,7 +276,7 @@ export default class Map extends Component {
     });
 
     const tooltip = new mapboxgl.Marker(this.tooltipContainer, {
-      offset: [-50, 0],
+      offset: [-90, 0],
     }).setLngLat([0,0]).addTo(this.map);
     
     this.map.on('mousemove', e => {
