@@ -254,17 +254,20 @@ export default class Map extends Component {
       });
 
       // Need to put ids on legend (separate for state/county)
-      // var stateLegendEl = document.getElementById('state-legend');
-      // var countyLegendEl = document.getElementById('county-legend');
+      var stateLegendEl = document.getElementById('state-legend');
+      var countyLegendEl = document.getElementById('county-legend');
       this.map.on('zoom', () => {
         if (this.state.location === 'state' && this.map.getZoom() > zoomThreshold) {
           let location = 'county';
-          let options = 
           this.setState({location});
+          stateLegendEl.style.display = 'none';
+          countyLegendEl.style.display = 'block';
         } 
         if (this.state.location === 'county' && this.map.getZoom() < zoomThreshold) {
           let location = 'state';
           this.setState({location});
+          stateLegendEl.style.display = 'block';
+          countyLegendEl.style.display = 'none';
         } 
         // else {
         //     stateLegendEl.style.display = 'block';
@@ -295,20 +298,20 @@ export default class Map extends Component {
 
     // When the user moves their mouse over the state-fill layer, we'll update the
     // feature state for the feature under the mouse.
-    // this.map.on('mousemove', 'state-fills', e => {
-    //   if(e.features.length > 0) {
-    //     if(this.state.hoveredStateId) {
-    //       this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: false});
-    //     }
+    this.map.on('mousemove', 'state-fills', e => {
+      if(e.features.length > 0) {
+        if(this.state.hoveredStateId) {
+          this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: false});
+        }
 
-    //     let hoveredStateId = e.features[0].id;
-    //     this.setState({hoveredStateId});
+        let hoveredStateId = e.features[0].id;
+        this.setState({hoveredStateId});
 
-    //     if(this.state.hoveredStateId) {
-    //       this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: true});
-    //     }
-    //   }
-    // });
+        if(this.state.hoveredStateId) {
+          this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: true});
+        }
+      }
+    });
 
     // When the mouse leaves the state-fill layer, update the feature state of the
     // previously hovered feature.
@@ -324,17 +327,23 @@ export default class Map extends Component {
   setFill() {
     const { property, stops } = this.state.active;
 
-    setTimeout(() => {
-      this.map.setPaintProperty('states', 'fill-opacity', 1);
-    }, 500);
-
+    // setTimeout(() => {
+    //   this.map.setPaintProperty('states', 'fill-opacity', 1);
+    // }, 500);
+    
     if(this.state.location == 'state'){
+      setTimeout(() => {
+        this.map.setPaintProperty('states', 'fill-opacity', 1);
+      }, 500);
       this.map.setPaintProperty('states', 'fill-color', {
         property,
         stops,
       });   
     }
     else{
+      setTimeout(() => {
+        this.map.setPaintProperty('counties', 'fill-opacity', 1);
+      }, 500);
       this.map.setPaintProperty('counties', 'fill-color', {
         property,
         stops,
@@ -346,18 +355,19 @@ export default class Map extends Component {
   render() {
     const { name, description, stops, property } = this.state.active;
     console.log(this.state);
-    console.log(this.options);
+    // console.log(this.options);
     // console.log(countyData);
     const renderLegendKeys = (stop, i) => {
       if(stop[0] <= Math.max.apply(null, stops.map(el=>el[0]))){
         return (
           <div key={i} className='txt-s'>
-            <span className='mr6 round-full w12 h12 inline-block align-middle' id={i} onMouseOver={e=>this.handleLegendHover(e)} style={{ backgroundColor: stop[1] }} />
+            <span className='mr6 round-full w12 h12 inline-block align-middle' id={i} style={{ backgroundColor: stop[1] }} />
+            {/* <span className='mr6 round-full w12 h12 inline-block align-middle' id={i} onMouseOver={e=>this.handleLegendHover(e)} style={{ backgroundColor: stop[1] }} /> */}
             <span>{`${stop[0].toLocaleString()}`}</span>
           </div>
         );
       }
-    };
+    };  
 
     const renderOptions = (option, i) => {
 
@@ -372,12 +382,30 @@ export default class Map extends Component {
         </label>
       );
     };
+    // let legendLoc = this.state.location['state'] ? 'county-legend' : 'state-legend';
+    // if (this.state.location === 'state'){
+    //   legendLoc = 'state-legend';
+    // } else {
+    //   legendLoc = 'county-legend';
+    // }
+    
 
     const renderedMap = <div ref={el => this.mapContainer = el} className="relative animation-fade-in fade-in">
       <div className="toggle-group absolute top left ml12 mt12 border border--2 border--white bg-white shadow-darken10 z1">
         {this.options.map(renderOptions)}
       </div>
-      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180">
+      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180" id='state-legend'>
+        <div className='mb6'>
+          <h2 className="txt-bold txt-s block legend-title">{name}</h2>
+          <p className='txt-s color-gray'>{description}</p>
+        </div>
+        {stops.map(renderLegendKeys)}
+        <div key={100} className='txt-s'>
+          <span className='mr6 round-full w12 h12 inline-block align-middle' style={{ backgroundColor: 'black' }} />
+          <span>{`No Data`}</span>
+        </div>
+      </div>
+      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180" id='county-legend'>
         <div className='mb6'>
           <h2 className="txt-bold txt-s block legend-title">{name}</h2>
           <p className='txt-s color-gray'>{description}</p>
