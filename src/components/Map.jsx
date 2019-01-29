@@ -145,11 +145,13 @@ export default class Map extends Component {
       this.map.addSource('states', {
         type: 'geojson',
         data: stateData,
+        generateId: true,
       });
 
       this.map.addSource('counties', {
         type: 'geojson',
         data: countyData,
+        generateId: true,
       });
 
       this.map.addLayer({
@@ -194,6 +196,7 @@ export default class Map extends Component {
         'type': 'fill',
         'source': 'states',
         'layout': {},
+        'maxzoom': zoomThreshold,
         'paint': {
           'fill-color': '#08306b',
           'fill-opacity': ['case',
@@ -312,6 +315,20 @@ export default class Map extends Component {
         }
       }
     });
+    this.map.on('mousemove', 'county-fills', e => {
+      if(e.features.length > 0) {
+        if(this.state.hoveredCountyId) {
+          this.map.setFeatureState({source: 'counties', id: this.state.hoveredCountyId}, { hover: false});
+        }
+
+        let hoveredCountyId = e.features[0].id;
+        this.setState({hoveredCountyId});
+
+        if(this.state.hoveredCountyId) {
+          this.map.setFeatureState({source: 'counties', id: this.state.hoveredCountyId}, { hover: true});
+        }
+      }
+    });
 
     // When the mouse leaves the state-fill layer, update the feature state of the
     // previously hovered feature.
@@ -322,6 +339,13 @@ export default class Map extends Component {
       let hoveredStateId = null;
       this.setState({hoveredStateId});
     });
+    this.map.on('mouseleave', 'county-fills', () => {
+      if (this.state.hoveredCountyId) {
+        this.map.setFeatureState({source: 'counties', id: this.state.hoveredCountyId}, { hover: false});
+      }
+      let hoveredCountyId = null;
+      this.setState({hoveredCountyId});
+    });
   }
 
   setFill() {
@@ -331,7 +355,7 @@ export default class Map extends Component {
     //   this.map.setPaintProperty('states', 'fill-opacity', 1);
     // }, 500);
     
-    if(this.state.location == 'state'){
+    if(this.state.location === 'state'){
       setTimeout(() => {
         this.map.setPaintProperty('states', 'fill-opacity', 1);
       }, 500);
