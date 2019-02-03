@@ -99,7 +99,7 @@ export default class Map extends Component {
   },
   {
     name: 'Per Capita',
-    description: 'Deaths per 100,000',
+    description: 'Dollars',
     property: 'correct_per_capita',
     stateStops: colorScale['state'].perCapita,
     countyStops: colorScale['county'].perCapita,
@@ -348,29 +348,22 @@ export default class Map extends Component {
   setFill() {
     const { property, stateStops, countyStops } = this.state.active;
     console.log('in setFill', property, stateStops, countyStops);
-    // setTimeout(() => {
-    //   this.map.setPaintProperty('states', 'fill-opacity', 1);
-    // }, 500);
+    setTimeout(() => {
+      this.map.setPaintProperty('states', 'fill-opacity', 1);
+    }, 500);
     let stops = this.state.location == 'state' ? stateStops : countyStops;
     if(this.state.location === 'state'){
-      setTimeout(() => {
-        this.map.setPaintProperty('states', 'fill-opacity', 1);
-      }, 500);
       this.map.setPaintProperty('states', 'fill-color', {
         property,
         stops,
       });   
     }
     else{
-      setTimeout(() => {
-        this.map.setPaintProperty('counties', 'fill-opacity', 1);
-      }, 500);
       this.map.setPaintProperty('counties', 'fill-color', {
         property,
         stops,
       }); 
     }
-    
   }
 
   render() {
