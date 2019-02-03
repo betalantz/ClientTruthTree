@@ -34,7 +34,7 @@ export default class App extends Component {
               animationDuration={0.5}
             />
           </div>
-          <h1 className="page-title">Social Justice Spending</h1>
+          <h1 className="page-title">Police Expenditures in the US</h1>
           <h2 className="subtitle">FINDINGS FROM THE GOVERNMENT FINANCE DATABASE</h2>
         </header>
         <section id="page1">

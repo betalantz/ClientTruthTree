@@ -87,19 +87,22 @@ export default class Map extends Component {
     name: 'Total',
     description: 'Dollars',
     property: 'correct_total_exp',
-    stops: colorScale[this.state ? this.state.location : 'state'].total,
+    stateStops: colorScale['state'].total,
+    countyStops: colorScale['county'].total,
   }, 
   {
     name: 'Vs. All Expenditures',
     description: 'Percent',
     property: 'correct_as_fraction_of_total_exp',
-    stops: colorScale[this.state ? this.state.location : 'state'].fraction,
+    stateStops: colorScale['state'].fraction,
+    countyStops: colorScale['county'].fraction,
   },
   {
     name: 'Per Capita',
     description: 'Deaths per 100,000',
     property: 'correct_per_capita',
-    stops: colorScale[this.state ? this.state.location : 'state'].perCapita,
+    stateStops: colorScale['state'].perCapita,
+    countyStops: colorScale['county'].perCapita,
   }];
 
   setTooltip(features, active, year) {
@@ -124,7 +127,9 @@ export default class Map extends Component {
     if(this.state !== prevState){
       this.setFill();
     }
-    
+    const { stateStops, countyStops } = this.state.active;
+    let stops = this.state.location == 'state' ? stateStops : countyStops;
+    console.log(this.state.location, stops);
   }
 
   componentDidMount() {
@@ -257,25 +262,17 @@ export default class Map extends Component {
       });
 
       // Need to put ids on legend (separate for state/county)
-      var stateLegendEl = document.getElementById('state-legend');
-      var countyLegendEl = document.getElementById('county-legend');
+      // var stateLegendEl = document.getElementById('state-legend');
+      // var countyLegendEl = document.getElementById('county-legend');
       this.map.on('zoom', () => {
         if (this.state.location === 'state' && this.map.getZoom() > zoomThreshold) {
           let location = 'county';
           this.setState({location});
-          stateLegendEl.style.display = 'none';
-          countyLegendEl.style.display = 'block';
         } 
         if (this.state.location === 'county' && this.map.getZoom() < zoomThreshold) {
           let location = 'state';
           this.setState({location});
-          stateLegendEl.style.display = 'block';
-          countyLegendEl.style.display = 'none';
         } 
-        // else {
-        //     stateLegendEl.style.display = 'block';
-        //     countyLegendEl.style.display = 'none';
-        //   }
       });
 
       this.setFill();
@@ -349,12 +346,12 @@ export default class Map extends Component {
   }
 
   setFill() {
-    const { property, stops } = this.state.active;
-
+    const { property, stateStops, countyStops } = this.state.active;
+    console.log('in setFill', property, stateStops, countyStops);
     // setTimeout(() => {
     //   this.map.setPaintProperty('states', 'fill-opacity', 1);
     // }, 500);
-    
+    let stops = this.state.location == 'state' ? stateStops : countyStops;
     if(this.state.location === 'state'){
       setTimeout(() => {
         this.map.setPaintProperty('states', 'fill-opacity', 1);
@@ -377,10 +374,11 @@ export default class Map extends Component {
   }
 
   render() {
-    const { name, description, stops, property } = this.state.active;
+    const { name, description, stateStops, countyStops, property } = this.state.active;
     console.log(this.state);
     // console.log(this.options);
     // console.log(countyData);
+    let stops = this.state.location == 'state' ? stateStops : countyStops;
     const renderLegendKeys = (stop, i) => {
       if(stop[0] <= Math.max.apply(null, stops.map(el=>el[0]))){
         return (
@@ -406,30 +404,13 @@ export default class Map extends Component {
         </label>
       );
     };
-    // let legendLoc = this.state.location['state'] ? 'county-legend' : 'state-legend';
-    // if (this.state.location === 'state'){
-    //   legendLoc = 'state-legend';
-    // } else {
-    //   legendLoc = 'county-legend';
-    // }
     
 
     const renderedMap = <div ref={el => this.mapContainer = el} className="relative animation-fade-in fade-in">
       <div className="toggle-group absolute top left ml12 mt12 border border--2 border--white bg-white shadow-darken10 z1">
         {this.options.map(renderOptions)}
       </div>
-      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180" id='state-legend'>
-        <div className='mb6'>
-          <h2 className="txt-bold txt-s block legend-title">{name}</h2>
-          <p className='txt-s color-gray'>{description}</p>
-        </div>
-        {stops.map(renderLegendKeys)}
-        <div key={100} className='txt-s'>
-          <span className='mr6 round-full w12 h12 inline-block align-middle' style={{ backgroundColor: 'black' }} />
-          <span>{`No Data`}</span>
-        </div>
-      </div>
-      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180" id='county-legend'>
+      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180" id='legend'>
         <div className='mb6'>
           <h2 className="txt-bold txt-s block legend-title">{name}</h2>
           <p className='txt-s color-gray'>{description}</p>
