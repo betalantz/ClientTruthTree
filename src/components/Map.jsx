@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import stateData from '../assets/modified_states.json';
 import countyData from '../assets/modified_counties.json';
 import Tooltip from './Tooltip';
@@ -143,6 +144,10 @@ export default class Map extends Component {
       minZoom: 3,
       zoom: 3,
     });
+
+    this.map.addControl(new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+    }));
 
     var zoomThreshold = 4;
 
