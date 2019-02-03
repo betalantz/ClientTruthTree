@@ -282,7 +282,7 @@ export default class Map extends Component {
     });
 
     const tooltip = new mapboxgl.Marker(this.tooltipContainer, {
-      offset: [-90, 0],
+      offset: [-110, 0],
     }).setLngLat([0,0]).addTo(this.map);
     
     this.map.on('mousemove', e => {
