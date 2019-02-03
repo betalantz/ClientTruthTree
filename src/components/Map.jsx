@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import mapboxgl from 'mapbox-gl';
-import stateData from '../assets/modified_states.json';
-import countyData from '../assets/modified_counties.json';
+import stateGeojson from '../assets/modified_states_2.json';
+import countyGeojson from '../assets/modified_counties_2.json';
 import Tooltip from './Tooltip';
 import '../styles/Map.css';
 import 'react-rangeslider/lib/index.css';
@@ -70,35 +70,35 @@ const colorScale = {
   },
 };
 
-
-
-
 export default class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
       location: 'state',
       active: this.options[0],
+      default: true,
     };
+
+    this.createMap = this.createMap.bind(this);
 
   }
 
   options = [{
     name: 'Total',
     description: 'Dollars',
-    property: 'correct_total_exp',
+    property: 'selected_field',
     stops: colorScale[this.state ? this.state.location : 'state'].total,
   }, 
   {
     name: 'Vs. All Expenditures',
     description: 'Percent',
-    property: 'correct_as_fraction_of_total_exp',
+    property: 'selected_field_as_fraction_of_total_rev',
     stops: colorScale[this.state ? this.state.location : 'state'].fraction,
   },
   {
     name: 'Per Capita',
     description: 'Deaths per 100,000',
-    property: 'correct_per_capita',
+    property: 'selected_field_per_capita',
     stops: colorScale[this.state ? this.state.location : 'state'].perCapita,
   }];
 
@@ -121,14 +121,46 @@ export default class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(this.state !== prevState){
-      this.setFill();
+    
+    // Try manipulating geojson data here and then add sources. (May need to remove sources first).
+    if(this.props !== prevProps){
+      stateGeojson['features'].forEach(state => {
+        try {
+          state.properties['selected_field'] = this.props.stateData[parseInt(state.properties.STATE)][this.props.selectedField];
+
+          state.properties['selected_field_as_fraction_of_total_rev'] = this.props.stateData[parseInt(state.properties.STATE)][this.props.selectedField] / state.properties['total_revenue'];
+          
+          state.properties['selected_field_per_capita'] = this.props.stateData[parseInt(state.properties.STATE)][this.props.selectedField] / state.properties['population'];
+        }
+        catch(err){
+          console.log(state.properties.NAME);
+          console.log(err);
+        }
+      }
+      );
+      countyGeojson['features'].forEach(county => {
+        try {
+          county.properties['selected_field'] = this.props.countyData[parseInt(county.properties.GFD_ID)][this.props.selectedField];
+
+          county.properties['selected_field_as_fraction_of_total_rev'] = this.props.countyData[parseInt(county.properties.GFD_ID)][this.props.selectedField] / county.properties['total_revenue'];
+          
+          county.properties['selected_field_per_capita'] = this.props.countyData[parseInt(county.properties.GFD_ID)][this.props.selectedField] / county.properties['population'];
+        }
+        catch(err){
+          // console.log(county.properties.NAME);
+          // console.log(err);
+        }
+      }
+      );
+
+      this.createMap();
     }
+
     
   }
 
-  componentDidMount() {
-    console.log(stateData);
+  createMap() {
+    // console.log(this.props.stateData);
     this.tooltipContainer = document.createElement('div');
 
     this.map = new mapboxgl.Map({
@@ -138,20 +170,20 @@ export default class Map extends Component {
       minZoom: 3,
       zoom: 3,
     });
-
+  
     var zoomThreshold = 4;
-
+  
     this.map.on('load', () => {
       this.map.addSource('states', {
         type: 'geojson',
-        data: stateData,
+        data: stateGeojson,
       });
-
+  
       this.map.addSource('counties', {
         type: 'geojson',
-        data: countyData,
+        data: countyGeojson,
       });
-
+  
       this.map.addLayer({
         id: 'states',
         type: 'fill',
@@ -165,28 +197,22 @@ export default class Map extends Component {
           },
         },
       });
-
+  
       this.map.addLayer({
         id: 'counties',
         type: 'fill',
         source: 'counties',
         minzoom: zoomThreshold,
-        // filter: ['==', 'isCounty', true],
-        // paint: {
-        //   'fill-opacity': 0,
-        //   'fill-opacity-transition': {
-        //     'duration': 2000,
-        //   },
-        // },
+         
       });
-
+  
       // Remove lables
       this.map.style.stylesheet.layers.forEach(layer => {
         if (layer['source-layer'] === 'place_label' || layer['source-layer'] === 'state_label') {
           this.map.removeLayer(layer.id);
         }
       });
-
+  
       // The feature-state dependent fill-opacity expression will render the hover effect
       // when a feature's hover state is set to true.
       this.map.addLayer({
@@ -203,7 +229,7 @@ export default class Map extends Component {
           ],
         },
       });
-
+  
       this.map.addLayer({
         'id': 'county-fills',
         'type': 'fill',
@@ -219,7 +245,7 @@ export default class Map extends Component {
           ],
         },
       });
-
+  
       this.map.addLayer({
         'id': 'state-borders',
         'type': 'line',
@@ -235,7 +261,7 @@ export default class Map extends Component {
           ],
         },
       });
-
+  
       this.map.addLayer({
         'id': 'county-borders',
         'type': 'line',
@@ -252,64 +278,49 @@ export default class Map extends Component {
           ],
         },
       });
-
+  
       // Need to put ids on legend (separate for state/county)
       // var stateLegendEl = document.getElementById('state-legend');
       // var countyLegendEl = document.getElementById('county-legend');
       this.map.on('zoom', () => {
         if (this.state.location === 'state' && this.map.getZoom() > zoomThreshold) {
           let location = 'county';
-          let options = 
+          // let options = 
           this.setState({location});
         } 
         if (this.state.location === 'county' && this.map.getZoom() < zoomThreshold) {
           let location = 'state';
           this.setState({location});
         } 
-        // else {
-        //     stateLegendEl.style.display = 'block';
-        //     countyLegendEl.style.display = 'none';
-        //   }
+          
       });
-
+  
       this.setFill();
     });
-
+  
     const tooltip = new mapboxgl.Marker(this.tooltipContainer, {
       offset: [-50, 0],
     }).setLngLat([0,0]).addTo(this.map);
-    
+
+    // We need to write the appropriate function here. Probably needs to be conditional based on state or county view.
+    this.map.on('click', e => {
+      const features = this.map.queryRenderedFeatures(e.point);
+      if(features[0].properties.STATE){
+        this.props.fetchLocaleData(this.state.location, features[0].properties.STATE);
+      }
+
+      if(features[0].properties.GFD_ID){
+        this.props.fetchLocaleData(this.state.location, features[0].properties.GFD_ID);
+      }
+    });
+      
     this.map.on('mousemove', e => {
       const features = this.map.queryRenderedFeatures(e.point);
       tooltip.setLngLat(e.lngLat);
       this.map.getCanvas().style.cursor = features.length ? 'pointer' : '';
       this.setTooltip(features, this.state.active, this.state.value);
     });
-
-    // this.map.on('click', e => {
-    //   const features = this.map.queryRenderedFeatures(e.point);
-    //   if(features[0].properties.opioid_data_location_id){
-    //     this.props.fetchStateData(features[0].properties.opioid_data_location_id);
-    //   }
-    // });
-
-    // When the user moves their mouse over the state-fill layer, we'll update the
-    // feature state for the feature under the mouse.
-    // this.map.on('mousemove', 'state-fills', e => {
-    //   if(e.features.length > 0) {
-    //     if(this.state.hoveredStateId) {
-    //       this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: false});
-    //     }
-
-    //     let hoveredStateId = e.features[0].id;
-    //     this.setState({hoveredStateId});
-
-    //     if(this.state.hoveredStateId) {
-    //       this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: true});
-    //     }
-    //   }
-    // });
-
+  
     // When the mouse leaves the state-fill layer, update the feature state of the
     // previously hovered feature.
     this.map.on('mouseleave', 'state-fills', () => {
@@ -321,6 +332,10 @@ export default class Map extends Component {
     });
   }
 
+  componentDidMount() {
+    this.createMap();
+  }
+
   setFill() {
     const { property, stops } = this.state.active;
 
@@ -328,7 +343,7 @@ export default class Map extends Component {
       this.map.setPaintProperty('states', 'fill-opacity', 1);
     }, 500);
 
-    if(this.state.location == 'state'){
+    if(this.state.location === 'state'){
       this.map.setPaintProperty('states', 'fill-color', {
         property,
         stops,
@@ -345,9 +360,8 @@ export default class Map extends Component {
 
   render() {
     const { name, description, stops, property } = this.state.active;
-    console.log(this.state);
-    console.log(this.options);
-    // console.log(countyData);
+    console.log(this.props.stateData);
+    console.log(stateGeojson);
     const renderLegendKeys = (stop, i) => {
       if(stop[0] <= Math.max.apply(null, stops.map(el=>el[0]))){
         return (
