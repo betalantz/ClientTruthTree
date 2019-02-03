@@ -6,6 +6,7 @@
     "mapbox-gl": "^0.52.0-beta.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "react-dropdown": "^1.6.4",
     "react-hamburger-menu": "^1.1.1",
     "react-player-controls": "^1.0.0-beta.0",
     "react-rangeslider": "^2.2.0",
@@ -15,7 +16,7 @@
     "react-spinners": "^0.4.7",
     "react-transition-group": "^2.5.1",
     "superagent": "^4.0.0",
-    "victory": "^31.0.1"
+    "victory": "^31.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
