@@ -189,6 +189,7 @@ export default class App extends Component {
             <Infographic
               data={localeData}
             />
+
           </section>        
         </div>
       );

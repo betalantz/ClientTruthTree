@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import mapboxgl from 'mapbox-gl';
+
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+
+
 import stateGeojson from '../assets/modified_states_2.json';
 import countyGeojson from '../assets/modified_counties_2.json';
+
 import Tooltip from './Tooltip';
 import '../styles/Map.css';
 import 'react-rangeslider/lib/index.css';
@@ -87,23 +92,28 @@ export default class Map extends Component {
     name: 'Total',
     description: 'Dollars',
     property: 'selected_field',
-    stops: colorScale[this.state ? this.state.location : 'state'].total,
+    stateStops: colorScale['state'].total,
+    countyStops: colorScale['county'].total,
+
   }, 
   {
     name: 'Vs. All Expenditures',
     description: 'Percent',
     property: 'selected_field_as_fraction_of_total_rev',
-    stops: colorScale[this.state ? this.state.location : 'state'].fraction,
+    stateStops: colorScale['state'].fraction,
+    countyStops: colorScale['county'].fraction,
   },
   {
     name: 'Per Capita',
-    description: 'Deaths per 100,000',
+    description: 'Dollars',
     property: 'selected_field_per_capita',
-    stops: colorScale[this.state ? this.state.location : 'state'].perCapita,
+    stateStops: colorScale['state'].perCapita,
+    countyStops: colorScale['county'].perCapita,
+
   }];
 
   setTooltip(features, active, year) {
-    if (features.length && features[0].properties && features[0].properties.sovereignt) {
+    if (features.length && features[0].properties && features[0].properties.GEO_ID) {
       ReactDOM.render(
         React.createElement(
           Tooltip, {
@@ -156,7 +166,10 @@ export default class Map extends Component {
       this.createMap();
     }
 
-    
+    const { stateStops, countyStops } = this.state.active;
+    let stops = this.state.location == 'state' ? stateStops : countyStops;
+    console.log(this.state.location, stops);
+
   }
 
   createMap() {
@@ -170,17 +183,25 @@ export default class Map extends Component {
       minZoom: 3,
       zoom: 3,
     });
-  
+
+    this.map.addControl(new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+    }));
+
     var zoomThreshold = 4;
   
     this.map.on('load', () => {
       this.map.addSource('states', {
         type: 'geojson',
         data: stateGeojson,
+        generateId: true,
+
       });
   
       this.map.addSource('counties', {
         type: 'geojson',
+        data: countyGeojson,
+        generateId: true,
         data: countyGeojson,
       });
   
@@ -220,6 +241,7 @@ export default class Map extends Component {
         'type': 'fill',
         'source': 'states',
         'layout': {},
+        'maxzoom': zoomThreshold,
         'paint': {
           'fill-color': '#08306b',
           'fill-opacity': ['case',
@@ -285,21 +307,21 @@ export default class Map extends Component {
       this.map.on('zoom', () => {
         if (this.state.location === 'state' && this.map.getZoom() > zoomThreshold) {
           let location = 'county';
-          // let options = 
+
           this.setState({location});
         } 
         if (this.state.location === 'county' && this.map.getZoom() < zoomThreshold) {
           let location = 'state';
           this.setState({location});
         } 
-          
+
       });
   
       this.setFill();
     });
   
     const tooltip = new mapboxgl.Marker(this.tooltipContainer, {
-      offset: [-50, 0],
+      offset: [-110, 0],
     }).setLngLat([0,0]).addTo(this.map);
 
     // We need to write the appropriate function here. Probably needs to be conditional based on state or county view.
@@ -320,7 +342,45 @@ export default class Map extends Component {
       this.map.getCanvas().style.cursor = features.length ? 'pointer' : '';
       this.setTooltip(features, this.state.active, this.state.value);
     });
-  
+
+    // this.map.on('click', e => {
+    //   const features = this.map.queryRenderedFeatures(e.point);
+    //   if(features[0].properties.opioid_data_location_id){
+    //     this.props.fetchStateData(features[0].properties.opioid_data_location_id);
+    //   }
+    // });
+
+    // When the user moves their mouse over the state-fill layer, we'll update the
+    // feature state for the feature under the mouse.
+    this.map.on('mousemove', 'state-fills', e => {
+      if(e.features.length > 0) {
+        if(this.state.hoveredStateId) {
+          this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: false});
+        }
+
+        let hoveredStateId = e.features[0].id;
+        this.setState({hoveredStateId});
+
+        if(this.state.hoveredStateId) {
+          this.map.setFeatureState({source: 'states', id: this.state.hoveredStateId}, { hover: true});
+        }
+      }
+    });
+    this.map.on('mousemove', 'county-fills', e => {
+      if(e.features.length > 0) {
+        if(this.state.hoveredCountyId) {
+          this.map.setFeatureState({source: 'counties', id: this.state.hoveredCountyId}, { hover: false});
+        }
+
+        let hoveredCountyId = e.features[0].id;
+        this.setState({hoveredCountyId});
+
+        if(this.state.hoveredCountyId) {
+          this.map.setFeatureState({source: 'counties', id: this.state.hoveredCountyId}, { hover: true});
+        }
+      }
+    });
+
     // When the mouse leaves the state-fill layer, update the feature state of the
     // previously hovered feature.
     this.map.on('mouseleave', 'state-fills', () => {
@@ -330,6 +390,13 @@ export default class Map extends Component {
       let hoveredStateId = null;
       this.setState({hoveredStateId});
     });
+    this.map.on('mouseleave', 'county-fills', () => {
+      if (this.state.hoveredCountyId) {
+        this.map.setFeatureState({source: 'counties', id: this.state.hoveredCountyId}, { hover: false});
+      }
+      let hoveredCountyId = null;
+      this.setState({hoveredCountyId});
+    });
   }
 
   componentDidMount() {
@@ -337,11 +404,12 @@ export default class Map extends Component {
   }
 
   setFill() {
-    const { property, stops } = this.state.active;
-
+    const { property, stateStops, countyStops } = this.state.active;
+    console.log('in setFill', property, stateStops, countyStops);
     setTimeout(() => {
       this.map.setPaintProperty('states', 'fill-opacity', 1);
     }, 500);
+    let stops = this.state.location == 'state' ? stateStops : countyStops;
 
     if(this.state.location === 'state'){
       this.map.setPaintProperty('states', 'fill-color', {
@@ -355,23 +423,27 @@ export default class Map extends Component {
         stops,
       }); 
     }
-    
   }
 
   render() {
-    const { name, description, stops, property } = this.state.active;
-    console.log(this.props.stateData);
-    console.log(stateGeojson);
+
+    const { name, description, stateStops, countyStops, property } = this.state.active;
+    console.log(this.state);
+    // console.log(this.options);
+    // console.log(countyData);
+    let stops = this.state.location == 'state' ? stateStops : countyStops;
+
     const renderLegendKeys = (stop, i) => {
       if(stop[0] <= Math.max.apply(null, stops.map(el=>el[0]))){
         return (
           <div key={i} className='txt-s'>
-            <span className='mr6 round-full w12 h12 inline-block align-middle' id={i} onMouseOver={e=>this.handleLegendHover(e)} style={{ backgroundColor: stop[1] }} />
+            <span className='mr6 round-full w12 h12 inline-block align-middle' id={i} style={{ backgroundColor: stop[1] }} />
+            {/* <span className='mr6 round-full w12 h12 inline-block align-middle' id={i} onMouseOver={e=>this.handleLegendHover(e)} style={{ backgroundColor: stop[1] }} /> */}
             <span>{`${stop[0].toLocaleString()}`}</span>
           </div>
         );
       }
-    };
+    };  
 
     const renderOptions = (option, i) => {
 
@@ -386,12 +458,13 @@ export default class Map extends Component {
         </label>
       );
     };
+    
 
     const renderedMap = <div ref={el => this.mapContainer = el} className="relative animation-fade-in fade-in">
       <div className="toggle-group absolute top left ml12 mt12 border border--2 border--white bg-white shadow-darken10 z1">
         {this.options.map(renderOptions)}
       </div>
-      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180">
+      <div className="bg-white absolute bottom right mr12 mb24 py12 px12 shadow-darken10 round z1 wmax180" id='legend'>
         <div className='mb6'>
           <h2 className="txt-bold txt-s block legend-title">{name}</h2>
           <p className='txt-s color-gray'>{description}</p>

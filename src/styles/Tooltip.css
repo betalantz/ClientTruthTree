@@ -1,5 +1,5 @@
 td {
-  width: 60px;
+  width: 120px;
   padding: 4px;
   box-sizing: border-box;
   border: solid 1px black;
@@ -22,7 +22,7 @@ td {
   box-sizing: border-box;
   border: solid 1px black;
   text-align: center;
-  width: 120px;
+  width: 240px;
   margin:0 auto;
   padding:2px;
   border-bottom: none;
